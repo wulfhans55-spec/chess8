@@ -151,7 +151,6 @@
             // Tell Stockfish to think
             stockfish.postMessage('position fen ' + game.fen());
             stockfish.postMessage('go depth 12'); // Change 12 to 20 if you want it even stronger
-            $status.text("ANALYZING YOUR FAILURE...");
         }
 
         function resetStallTimer() {
