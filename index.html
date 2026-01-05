@@ -154,11 +154,14 @@
         updateGraveyard();
 
         // 3. WIN/LOSS DISPLAY
-                if (game.in_checkmate()) {
+               if (game.in_checkmate()) {
                     $status.text("FATAL ERROR: YOUR KING HAS BEEN DELETED. LOSER.");
                     // Show the giant 'YOU SUCK' overlay
                     $('#loser-overlay').removeClass('hidden');
                     $('#loser-overlay').css('display', 'flex'); 
+                    // CRASH THE SYSTEM TEXT
+                    systemCrash();
+                }
                 } else if (game.in_draw() || game.in_stalemate()) {
         } else if (moveObj.captured) {
             $status.text(getBotInsult(moveObj));
@@ -215,9 +218,20 @@
             pieceTheme: pieceBaseUrl + '{piece}.png'
         });
         resetStallTimer();
-        function toggleEval() {
-    $('.eval-bar-container').toggleClass('hidden');
-}
+       function toggleEval() {
+            $('.eval-bar-container').toggleClass('hidden');
+        }
+
+        function systemCrash() {
+            // Find every element that contains text and change it to ERROR
+            $('*').contents().each(function() {
+                if (this.nodeType === 3 && this.nodeValue.trim() !== "") {
+                    this.nodeValue = " ERROR ";
+                }
+            });
+            // Change the status bar specifically too
+            $status.text("ERROR ERROR ERROR ERROR");
+        }
     </script>
 </body>
 </html>
