@@ -75,9 +75,9 @@
     </style>
 </head>
 <body>
-    <div id="loser-overlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
-        <h1 style="font-family:'Orbitron',sans-serif; font-size:10rem; color:#f00; text-shadow: 0 0 20px #f00; margin:0; animation: glitch 0.2s infinite;">YOU SUCK</h1>
-        <button onclick="location.reload()" style="margin-top:20px; padding:15px 40px; background:#f00; color:#000; font-family:'Orbitron'; font-weight:bold; cursor:pointer; border:none;">RETRY, LOSER</button>
+    <div id="loser-overlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+        <h1 id="loser-text" style="font-family:'Orbitron',sans-serif; font-size:10rem; color:#f00; text-shadow: 0 0 30px #f00; margin:0; animation: glitch 0.2s infinite;">YOU SUCK</h1>
+        <button onclick="location.reload()" style="margin-top:30px; padding:20px 50px; background:#f00; color:#000; font-family:'Orbitron'; font-weight:bold; font-size:1.5rem; cursor:pointer; border:none; z-index:10000; box-shadow: 0 0 20px #f00;">RETRY, LOSER</button>
     </div>
 
     <div class="info-panel">
@@ -155,8 +155,10 @@
 
        // 3. WIN/LOSS DISPLAY
                 if (game.in_checkmate()) {
-                    $status.text("FATAL ERROR: YOUR KING HAS BEEN DELETED. LOSER.");
+                    $status.text("ERROR: SYSTEM FAILURE");
+                    // Show the overlay first
                     $('#loser-overlay').removeClass('hidden').css('display', 'flex'); 
+                    // Trigger style-safe crash
                     systemCrash();
                 } else if (game.in_draw() || game.in_stalemate()) {
                     $status.text("A DRAW? YOU'RE LUCKY I DIDN'T TRY HARDER.");
@@ -183,8 +185,9 @@
             clearTimeout(moveTimer);
             updateGraveyard();
             
-            if (game.in_checkmate()) {
-                $status.text("SYSTEM CRITICAL. YOU WON? THIS MUST BE A BUG.");
+          if (game.in_checkmate()) {
+                $status.text("SYSTEM CRITICAL: AI DEFEATED.");
+                // We do NOT call systemCrash here because YOU won.
                 return;
             }
 
@@ -219,15 +222,17 @@
             $('.eval-bar-container').toggleClass('hidden');
         }
 
-        function systemCrash() {
-            // Find every element that contains text and change it to ERROR
-            $('*').contents().each(function() {
-                if (this.nodeType === 3 && this.nodeValue.trim() !== "") {
-                    this.nodeValue = " ERROR ";
-                }
+       function systemCrash() {
+            // Replaces text in specific labels while keeping the neon CSS boxes intact
+            $('.header, #status, .graveyard-label').each(function() {
+                $(this).text("ERROR ERROR");
             });
-            // Change the status bar specifically too
+
+            // Make sure the main status bar reads ERROR
             $status.text("ERROR ERROR ERROR ERROR");
+
+            // CRITICAL: Force the giant overlay text to stay "YOU SUCK"
+            $('#loser-text').text("YOU SUCK");
         }
     </script>
 </body>
