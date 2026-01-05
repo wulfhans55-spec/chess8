@@ -27,7 +27,7 @@
         }
 
         .info-panel { 
-            background: rgba(10, 10, 10, 0.9); padding: 15px; margin-bottom: 10px; 
+            background: rgba(0, 20, 0, 0.9); padding: 15px; margin-bottom: 10px; 
             text-align: center; width: 95vw; max-width: 1150px; border: 2px solid #0f0; 
             box-shadow: 0 0 15px #0f0;
         }
@@ -38,31 +38,42 @@
             text-transform: uppercase; text-shadow: 2px 2px 0px #000;
         }
 
-        .game-container { display: flex; align-items: center; gap: 25px; }
-        #board { width: 420px; border: 4px solid #0f0; box-shadow: 0 0 25px #0f0; }
-
-        .white-1e1d7 { background-color: #0a200a !important; box-shadow: inset 0 0 15px #0f0; } 
-        .black-3c85d { background-color: #200a0a !important; box-shadow: inset 0 0 15px #f00; } 
+        /* BOARD COLORS - FORCING GREEN AND BLACK */
+        .white-1e1d7 { background-color: #003300 !important; } /* Dark Green Squares */
+        .black-3c85d { background-color: #000000 !important; } /* Pure Black Squares */
         
+        .game-container { display: flex; align-items: center; gap: 25px; }
+        
+        #board { 
+            width: 420px; 
+            border: 4px solid #0f0; 
+            box-shadow: 0 0 30px #0f0; 
+        }
+
+        /* Makes the pieces look slightly "digital" */
+        .piece-417db { filter: drop-shadow(0 0 5px #0f0); }
+
         .graveyard { 
             width: 85px; height: 420px; background: #050505; border: 1px solid #0f0; 
             padding: 8px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px;
         }
-        .graveyard img { width: 35px; height: 35px; filter: drop-shadow(0 0 2px #0f0); }
+        .graveyard img { width: 35px; height: 35px; filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg); }
         .graveyard-label { width: 100%; font-size: 0.75rem; color: #f00; text-align: center; margin-bottom: 8px; font-weight: bold; }
 
         .controls { margin-top: 15px; }
         button { 
             background: #f00; color: #000; border: none; padding: 12px 35px; cursor: pointer; 
             font-family: 'Orbitron', sans-serif; font-weight: bold; text-transform: uppercase;
+            box-shadow: 0 0 10px #f00;
         }
+        button:hover { background: #fff; }
     </style>
 </head>
 <body>
 
     <div class="info-panel">
         <div class="header"><b>[ CYBER-BULLY ]</b></div>
-        <div id="status">STOCKFISH ONLINE. PREPARE TO LOSE.</div>
+        <div id="status">STOCKFISH v10 LOADED. GOOD LUCK, WEAKLING.</div>
     </div>
 
     <div class="game-container">
@@ -87,20 +98,19 @@
         var playerLostFirstPiece = false;
         var pieceBaseUrl = 'https://chessboardjs.com/img/chesspieces/wikipedia/';
 
-        // Initialize Stockfish Brain
+        // Initialize Stockfish Brain (Must be in your GitHub folder)
         var stockfish = new Worker('stockfish.js');
 
         const insults = {
-            firstLoss: "I hope you weren't attached to that.",
-            queenLoss: "Your Queen just left you. Even my algorithms saw that divorce coming.",
-            undo: ["Oh, a do-over? I didn't realize I was playing such a pussy.", "Move retracted. What a loser."],
-            stalling: ["Are you thinking, or did your brain just crash?", "I’ve finished 14 million simulations while waiting for you.", "You're stalling because you're scared."],
+            firstLoss: "I hope you weren't attached to that piece.",
+            queenLoss: "Your Queen just left you. Pathetic.",
+            undo: ["Oh, a do-over? What a loser.", "Error: Courage not found. Undo accepted."],
+            stalling: ["Are you thinking, or did you freeze?", "I’ve simulated your defeat already. Move."],
             general: [
-                "Hurry up. I have better things to calculate than your crappy moves.",
                 "That move was a digital suicide note.",
-                "I’m calculating 10 moves ahead. You’re struggling to find the 'Move' button.",
-                "Warning: Brain not detected.",
-                "My sensors indicate your current ELO is lower than your IQ."
+                "I’m calculating 12 moves ahead. You're barely finding the mouse.",
+                "Warning: Low IQ detected in player moves.",
+                "My sensors indicate you are a total failure."
             ]
         };
 
@@ -115,7 +125,6 @@
             });
         }
 
-        // STOCKFISH RESPONSE HANDLER
         stockfish.onmessage = function(event) {
             if (event.data.includes('bestmove')) {
                 var moveStr = event.data.split(' ')[1];
@@ -134,10 +143,7 @@
 
         function getBotInsult(move) {
             if (move.captured === 'q') return insults.queenLoss;
-            if (!playerLostFirstPiece && move.captured) { 
-                playerLostFirstPiece = true; 
-                return insults.firstLoss; 
-            }
+            if (!playerLostFirstPiece && move.captured) { playerLostFirstPiece = true; return insults.firstLoss; }
             return insults.general[Math.floor(Math.random() * insults.general.length)];
         }
 
@@ -148,10 +154,9 @@
             clearTimeout(moveTimer);
             updateGraveyard();
             
-            // Tell Stockfish to think
             stockfish.postMessage('position fen ' + game.fen());
-            stockfish.postMessage('go depth 12'); // Change 12 to 20 if you want it even stronger
-            $status.text("ANALYZING YOUR FAILURE...");
+            stockfish.postMessage('go depth 12');
+            $status.text("ANALYZING YOUR TRASH MOVE...");
         }
 
         function resetStallTimer() {
@@ -170,7 +175,9 @@
         }
 
         board = Chessboard('board', {
-            draggable: true, position: 'start', onDrop: onDrop,
+            draggable: true, 
+            position: 'start', 
+            onDrop: onDrop,
             pieceTheme: pieceBaseUrl + '{piece}.png'
         });
         resetStallTimer();
