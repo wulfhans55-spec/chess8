@@ -71,9 +71,14 @@
             font-family: 'Orbitron', sans-serif; font-weight: bold; text-transform: uppercase;
         }
         .hidden { display: none !important; }
+        #loser-overlay.hidden { display: none !important; }
     </style>
 </head>
 <body>
+    <div id="loser-overlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+        <h1 style="font-family:'Orbitron',sans-serif; font-size:10rem; color:#f00; text-shadow: 0 0 20px #f00; margin:0; animation: glitch 0.2s infinite;">YOU SUCK</h1>
+        <button onclick="location.reload()" style="margin-top:20px; padding:15px 40px; background:#f00; color:#000; font-family:'Orbitron'; font-weight:bold; cursor:pointer; border:none;">RETRY, LOSER</button>
+    </div>
 
     <div class="info-panel">
         <div class="header"><b>[ CYBER-BULLY ]</b></div>
@@ -148,10 +153,13 @@
         board.position(game.fen());
         updateGraveyard();
 
-        if (game.in_checkmate()) {
-            $status.text("FATAL ERROR: YOUR KING HAS BEEN DELETED. LOSER.");
-        } else if (game.in_draw() || game.in_stalemate()) {
-            $status.text("A DRAW? YOU'RE LUCKY I DIDN'T TRY HARDER.");
+        // 3. WIN/LOSS DISPLAY
+                if (game.in_checkmate()) {
+                    $status.text("FATAL ERROR: YOUR KING HAS BEEN DELETED. LOSER.");
+                    // Show the giant 'YOU SUCK' overlay
+                    $('#loser-overlay').removeClass('hidden');
+                    $('#loser-overlay').css('display', 'flex'); 
+                } else if (game.in_draw() || game.in_stalemate()) {
         } else if (moveObj.captured) {
             $status.text(getBotInsult(moveObj));
         }
