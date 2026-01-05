@@ -153,22 +153,19 @@
         board.position(game.fen());
         updateGraveyard();
 
-        // 3. WIN/LOSS DISPLAY
-               if (game.in_checkmate()) {
+       // 3. WIN/LOSS DISPLAY
+                if (game.in_checkmate()) {
                     $status.text("FATAL ERROR: YOUR KING HAS BEEN DELETED. LOSER.");
-                    // Show the giant 'YOU SUCK' overlay
-                    $('#loser-overlay').removeClass('hidden');
-                    $('#loser-overlay').css('display', 'flex'); 
-                    // CRASH THE SYSTEM TEXT
+                    $('#loser-overlay').removeClass('hidden').css('display', 'flex'); 
                     systemCrash();
-                }
                 } else if (game.in_draw() || game.in_stalemate()) {
-        } else if (moveObj.captured) {
-            $status.text(getBotInsult(moveObj));
-        }
-        resetStallTimer();
-    }
-};
+                    $status.text("A DRAW? YOU'RE LUCKY I DIDN'T TRY HARDER.");
+                } else if (moveObj.captured) {
+                    $status.text(getBotInsult(moveObj));
+                }
+                resetStallTimer();
+            }
+        };
 
         function getBotInsult(move) {
             if (move.captured === 'q') return insults.queenLoss;
